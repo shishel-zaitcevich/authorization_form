@@ -7,7 +7,11 @@ import '../styles/globals.css';
 
 const theme = createTheme({
   palette: {
-    primary: { main: '#1677ff' },
+    primary: {
+      main: '#1677ff',
+      light: '#d9d9d9',
+      dark: 'rgba(0, 0, 0, 0.04)',
+    },
     text: { primary: '#000' },
   },
   components: {

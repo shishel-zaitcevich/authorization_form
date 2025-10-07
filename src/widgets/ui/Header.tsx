@@ -16,7 +16,7 @@ export default function Header() {
       <div className="symbol">
         <div
           style={{
-            background: '#1976d2',
+            background: '#1677ff',
             width: '24px',
             height: '24px',
             display: 'flex',

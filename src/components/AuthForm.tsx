@@ -5,9 +5,13 @@ import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
-import { motion } from 'framer-motion';
-import { Box } from '@mui/material';
-import Header from '../widgets/ui/Header';
+import Box from '@mui/material/Box';
+import { useEmailValidation } from '../hooks/useEmailValidation';
+import {
+  getInputStyles,
+  errorTextStyles,
+  getButtonStyles,
+} from '../lib/textFieldStyles';
 
 interface Props {
   onSuccess: () => void;
@@ -15,9 +19,18 @@ interface Props {
 }
 
 export default function AuthForm({ onSuccess, setError }: Props) {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const isDisabled = !email || !password;
+
+  const {
+    email,
+    emailError,
+    touched,
+    handleEmailChange,
+    handleEmailBlur,
+    validateBeforeSubmit,
+  } = useEmailValidation();
+
+  const isDisabled = !email || !password || !!emailError;
 
   const mutation = useMutation({
     mutationFn: loginMock,
@@ -34,21 +47,15 @@ export default function AuthForm({ onSuccess, setError }: Props) {
   });
 
   const handleSubmit = () => {
+    if (!validateBeforeSubmit()) {
+      return;
+    }
+
     mutation.mutate({ email, password });
   };
 
   return (
-    <Box
-      sx={{
-        p: 2,
-        boxShadow: 3,
-        borderRadius: '6px',
-        minHeight: '372px',
-        width: '440px',
-        padding: '32px',
-      }}
-    >
-      <Header />
+    <>
       <Typography
         variant="h5"
         align="center"
@@ -62,38 +69,35 @@ export default function AuthForm({ onSuccess, setError }: Props) {
       >
         Sign in to your account to continue
       </Typography>
-      <TextField
-        fullWidth
-        placeholder="Email"
-        variant="outlined"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        sx={{
-          mb: 2,
-          '& .MuiOutlinedInput-root': {
-            height: '40px',
-            padding: '8px 11px',
-            '&:hover': {
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: (theme) => theme.palette.primary.main,
-                boxShadow: '0px 0px 0px 2px rgba(5, 145, 255, 0.1)',
-              },
-            },
-          },
-        }}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <img
-                src="/images/login.svg"
-                alt="Login icon"
-                style={{ width: 16, height: 16 }}
-              />
-            </InputAdornment>
-          ),
-        }}
-        autoFocus
-      />
+
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          placeholder="Email"
+          variant="outlined"
+          value={email}
+          onChange={(e) => handleEmailChange(e.target.value)}
+          onBlur={handleEmailBlur}
+          error={touched && !!emailError}
+          sx={getInputStyles(touched && !!emailError)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <img
+                  src="/images/login.svg"
+                  alt="Login icon"
+                  style={{ width: 16, height: 16 }}
+                />
+              </InputAdornment>
+            ),
+          }}
+          autoFocus
+        />
+        {touched && emailError && (
+          <Typography sx={errorTextStyles}>{emailError}</Typography>
+        )}
+      </Box>
+
       <TextField
         fullWidth
         placeholder="Password"
@@ -101,19 +105,7 @@ export default function AuthForm({ onSuccess, setError }: Props) {
         variant="outlined"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        sx={{
-          mb: 2,
-          '& .MuiOutlinedInput-root': {
-            height: '40px',
-            padding: '8px 11px',
-            '&:hover': {
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: (theme) => theme.palette.primary.main,
-                boxShadow: '0px 0px 0px 2px rgba(5, 145, 255, 0.1)',
-              },
-            },
-          },
-        }}
+        sx={{ ...getInputStyles(), mb: 2 }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start">
@@ -129,17 +121,12 @@ export default function AuthForm({ onSuccess, setError }: Props) {
       <Button
         fullWidth
         variant="contained"
-        color="primary"
         onClick={handleSubmit}
         disabled={isDisabled || mutation.isPending}
-        sx={{
-          background: isDisabled ? '#e0e0e0' : '#1976d2',
-          color: '#fff',
-          height: '40px',
-        }}
+        sx={getButtonStyles(isDisabled || mutation.isPending)}
       >
         {mutation.isPending ? 'Logging in...' : 'Log in'}
       </Button>
-    </Box>
+    </>
   );
 }
