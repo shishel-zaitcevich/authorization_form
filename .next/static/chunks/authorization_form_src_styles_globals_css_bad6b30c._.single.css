@@ -1,0 +1,20 @@
+/* [project]/authorization_form/src/styles/globals.css [app-client] (css) */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@font-face {
+  font-family: SFProText;
+  src: url("/fonts/FontsFree-Net-SFProText-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  margin: 0;
+  font-family: SFProText, sans-serif;
+}
+
+/*# sourceMappingURL=authorization_form_src_styles_globals_css_bad6b30c._.single.css.map*/
